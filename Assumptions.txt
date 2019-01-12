@@ -1,0 +1,3 @@
+Assumptions:
+    -Values to be assigned to the vector should be representable as floats.
+    
