@@ -44,36 +44,35 @@ void Convolution::pad_matrix(int padding, int max_rows)
     }
 }
 
-void Convolution::convolve()
+Matrix Convolution::convolve()
 {
     int m = mat.get_max_rows();
     int k = kernel.get_max_rows();
-    //Matrix reflected_kernel=kernel.reflect_matrix();
+    Matrix reflected_kernel=kernel.reflect_matrix();
     Matrix conv(m+k-1);
-    for(int i=0; i<=m+k-2; i++)
-    {
-        for(int j=0; j<=m+k-2; j++)
-        {
-            conv.set(0,i,j);
-        }
-    }
+    // for(int i=0; i<=m+k-2; i++)
+    // {
+    //     for(int j=0; j<=m+k-2; j++)
+    //     {
+    //         conv.set(0,i,j);
+    //     }
+    // }
     int x,y,i,j,sum;
-    int temp = (k-1)/2;
-    
-    for(y=k;y<m-k;y++)
+
+    for(x=0;x<m-k;x++)
     {
-        for(x=k;x<m-k;x++)
+        for(y=0;y<m-k;y++)
         {
             sum=0;
-            for(i=(-1*temp);i<=temp;i++)
+            for(i=x;i<x+k;i++)
             {
-                for(j=(-1*temp);j<=temp;j++)
+                for(j=y;j<y+k;j++)
                 {
-                    sum = sum + kernel.get(j +1, i + 1)*mat.get(x - j, y - i);
+                    sum = sum + reflected_kernel.get(i-x,j-y)*mat.get(i,j);
                 }
             }
             conv.set(sum,x,y);
         }
     }
+    return conv;
 }
-
