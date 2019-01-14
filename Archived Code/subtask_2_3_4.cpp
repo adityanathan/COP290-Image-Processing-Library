@@ -194,51 +194,51 @@ vector<vector<float>> average_pooling(vector<vector<float>> m, int width, int st
 
 }
 
-int main() {
-    // insert code here...
-    //Vector v=read_file("afile.txt");
-    //Vector ans=sigmoid(v);
-    //Vector ans2=softmax(v);
-
-    vector<vector<float>> m(5,vector<float>(5,0));
-    m[0][0]=-1;
-    m[0][1]=2;
-    m[0][2]=3;
-    m[0][3]=4;
-    m[0][4]=-1;
-    m[1][0]=2;
-    m[1][1]=3;
-    m[1][2]=4;
-    m[1][3]=-1;
-    m[1][4]=2;
-    m[2][0]=3;
-    m[2][1]=4;
-    m[2][2]=-1;
-    m[2][3]=2;
-    m[2][4]=3;
-    m[3][0]=4;
-    m[3][1]=-1;
-    m[3][2]=2;
-    m[3][3]=3;
-    m[3][4]=4;
-    m[4][0]=-1;
-    m[4][1]=2;
-    m[4][2]=3;
-    m[4][3]=4;
-    m[4][4]=5;
-    //Matrix t=relu(m);
-
-    vector<vector<float>> ans=average_pooling(m,3,2);
-    int n=ans.size();
-    for(int i=0; i<n; i++)
-    {
-        for(int j=0; j<n; j++)
-        {
-            std::cout<<ans[i][j]<<std::endl;
-        }
-    }
-    return 0;
-}
+// int main() {
+//     // insert code here...
+//     //Vector v=read_file("afile.txt");
+//     //Vector ans=sigmoid(v);
+//     //Vector ans2=softmax(v);
+//
+//     vector<vector<float>> m(5,vector<float>(5,0));
+//     m[0][0]=-1;
+//     m[0][1]=2;
+//     m[0][2]=3;
+//     m[0][3]=4;
+//     m[0][4]=-1;
+//     m[1][0]=2;
+//     m[1][1]=3;
+//     m[1][2]=4;
+//     m[1][3]=-1;
+//     m[1][4]=2;
+//     m[2][0]=3;
+//     m[2][1]=4;
+//     m[2][2]=-1;
+//     m[2][3]=2;
+//     m[2][4]=3;
+//     m[3][0]=4;
+//     m[3][1]=-1;
+//     m[3][2]=2;
+//     m[3][3]=3;
+//     m[3][4]=4;
+//     m[4][0]=-1;
+//     m[4][1]=2;
+//     m[4][2]=3;
+//     m[4][3]=4;
+//     m[4][4]=5;
+//     //Matrix t=relu(m);
+//
+//     vector<vector<float>> ans=average_pooling(m,3,2);
+//     int n=ans.size();
+//     for(int i=0; i<n; i++)
+//     {
+//         for(int j=0; j<n; j++)
+//         {
+//             std::cout<<ans[i][j]<<std::endl;
+//         }
+//     }
+//     return 0;
+// }
 
 // int main(int argc, char** argv)
 // {
