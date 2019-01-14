@@ -80,16 +80,24 @@ vector<vector<int>> padding(vector<vector<int>> matrix, int pad)
 
 vector<vector<int>> matrix_multiply(vector<vector<int>> mat1, vector<vector<int>> mat2)
 {
-  vector<vector<int>> result(mat1.size(), vector<int>(mat2[1].size(),0));
-  for(int i=0;i<mat1.size();i++)
-	{
-		for(int j=0;j<mat2[1].size();j++)
-		{
-			for(int k=0;k<n;++k)
-				result[i][j]=result[i][j]+(result[i][k]*result[k][j]);
-	  }
+  if(mat2.size()==mat1[0].size())
+  {
+    vector<vector<int>> result(mat1.size(), vector<int>(mat2[1].size(),0));
+    for(int i=0;i<mat1.size();i++)
+  	{
+  		for(int j=0;j<mat2[1].size();j++)
+  		{
+  			for(int k=0;k<mat2.size();k++)
+  				result[i][j]=result[i][j]+(mat1[i][k]*mat2[k][j]);
+  	  }
+    }
+    return result;
   }
-  return result;
+  else
+  {
+    //Throw Exception
+    cout<<"Matrix Dimensions don't match!"<<endl;
+  }
 }
 
 vector < vector <int> > toeplitz_convolve(vector<vector<int>> matrix, vector<vector<int>> kernel)
@@ -106,59 +114,125 @@ vector < vector <int> > toeplitz_convolve(vector<vector<int>> matrix, vector<vec
       padded_kernel[i][j]=kernel[i][j];
     }
   }
-  vector<<vector<vector<int>>> h(dim,vector<vector<int>>(dim,vector<int>(m,0)));
+
+  // for(int i = 0; i<padded_kernel.size(); i++)
+  // {
+  //   for(int j=0; j<padded_kernel[0].size(); j++)
+  //   {
+  //     cout<<padded_kernel[i][j]<<" ";
+  //   }
+  //   cout<<endl;
+  // }
+  // cout<<endl;
+
+  vector<vector<vector<int>>> h(dim,vector<vector<int>>(dim,vector<int>(m,0)));
 
   for(int z=0; z<dim; z++)
   {
-    vector<int> a = padded_kernel[i];
+    vector<int> a = padded_kernel[z];
+    int i=0;
     for(int y=0; y<m; y++)
     {
-      int i=0;
       for (int x = i; x < dim; x++)
       {
         h[z][x][y]=a[x-i];
-        i++;
       }
+      i++;
     }
   }
+  // for(int a=0; a<h.size();a++)
+  // {
+  //   for(int i = 0; i<h[0].size(); i++)
+  //   {
+  //     for(int j=0; j<h[0][0].size(); j++)
+  //     {
+  //       cout<<h[a][i][j]<<" ";
+  //     }
+  //     cout<<endl;
+  //   }
+  //   cout<<endl;
+  // }
+  // cout<<endl;
 
   vector<vector<int>> h_2d(dim*dim, vector<int>(m*m,0));
-  for(i=0; i<dim*dim; i+=dim)
+  int b=0;
+  for(int i=0; i<dim*dim; i+=dim)
   {
-    for(j=0;j<m*m; j+=m)
+    b=i/dim;
+    for(int j=0;j<m*m; j+=m)
     {
       if(b<0)
       {
         b=dim-1;
       }
-      for(int k=i;k<i+dim;k++)
+      for(int p=i;p<i+dim;p++)
       {
         for(int l=j;l<j+m;l++)
         {
-          h_2d[k][l]=h[b][k-i][l-j];
+          h_2d[p][l]=h[b][p-i][l-j];
         }
       }
       b--;
     }
   }
 
-  vector<int> resized_input(m*m,0);
-  k=0;
-  for(i=0; i<m; i++)
+  // for(int i = 0; i<h_2d.size(); i++)
+  // {
+  //   for(int j=0; j<h_2d[0].size(); j++)
+  //   {
+  //     cout<<h_2d[i][j]<<" ";
+  //   }
+  //   cout<<endl;
+  // }
+  // cout<<endl;
+  vector<vector<int>> resized_input(m*m,vector<int>(1,0));
+  int p=0;
+  for(int i=0; i<m; i++)
   {
-    for(j=0; j<m; j++)
+    for(int j=0; j<m; j++)
     {
-      resized_input[k]=matrix[i][j];
-      k++;
+      resized_input[p][0]=matrix[i][j];
+      p++;
     }
   }
 
+  // for(int i = 0; i<resized_input.size(); i++)
+  // {
+  //   for(int j=0; j<resized_input[0].size(); j++)
+  //   {
+  //     cout<<resized_input[i][j]<<" ";
+  //   }
+  //   cout<<endl;
+  // }
+  // cout<<endl;
+
   vector<vector<int>> output = matrix_multiply(h_2d, resized_input);
 
-  
 
 
+  vector<vector<int>> resized_output(m+k-1,vector<int>(m+k-1));
+
+  p=0;
+  for(int i=0;i<m+k-1;i++)
+  {
+    for(int j=0;j<m+k-1;j++)
+    {
+      resized_output[i][j]=output[p][0];
+      p++;
+      // cout<<resized_output[i][j]<<" ";
+    }
+    // cout<<endl;
   }
+  // cout<<endl;
+  vector<vector<int>> trimmed_output(m-k+1, vector<int>(m-k+1,0));
+  for(int i=k-1;i<m;i++)
+  {
+    for(int j=k-1;j<m;j++)
+    {
+      trimmed_output[i-k+1][j-k+1]=resized_output[i][j];
+    }
+  }
+  return trimmed_output;
 }
 
 
@@ -167,6 +241,7 @@ int main()
   vector < vector <int> > Mat(3, std::vector<int>(3, 0));
   vector < vector <int> > input(5, std::vector<int>(5, 0));
   int t=0;
+  cout<<"kernel"<<endl;
   for(int i=0; i<3; i++)
   {
     for(int j=0;j<3;j++)
@@ -177,6 +252,7 @@ int main()
     cout<<endl;
   }
   cout<<endl;
+  cout<<"input_matrix"<<endl;
   t=0;
   for(int i=0; i<5; i++)
   {
@@ -190,6 +266,7 @@ int main()
   cout<<endl;
 
   vector<vector<int>> padded = padding(input, 1);
+  cout<<"padded input matrix"<<endl;
   for(int i=0; i<7; i++)
   {
     for(int j=0;j<7;j++)
@@ -201,6 +278,7 @@ int main()
   cout<<endl;
 
   vector < vector <int> > Mat2 = reflect_kernel(Mat);
+  cout<<"reflected kernel"<<endl;
   for(int i=0; i<3; i++)
   {
     for(int j=0;j<3;j++)
@@ -211,7 +289,7 @@ int main()
   }
   cout<<endl;
   vector < vector <int> > Mat3 = convolve(input,Mat);
-
+  cout<<"normal convolution by sliding window"<<endl;
   for(int i=0; i<3; i++)
   {
     for(int j=0;j<3;j++)
@@ -220,14 +298,25 @@ int main()
     }
     cout<<endl;
   }
-
+  cout<<endl;
   Mat3 = convolve(padded,Mat);
-
+  cout<<"normal convolution by sliding window with padding"<<endl;
   for(int i=0; i<5; i++)
   {
     for(int j=0;j<5;j++)
     {
       cout<<Mat3[i][j]<<" ";
+    }
+    cout<<endl;
+  }
+  cout<<endl;
+  vector<vector<int>> Mat7=toeplitz_convolve(input,Mat);
+  cout<<"toeplitz convolution by sliding window"<<endl;
+  for(int i=0; i<Mat7.size(); i++)
+  {
+    for(int j=0;j<Mat7[0].size();j++)
+    {
+      cout<<Mat7[i][j]<<" ";
     }
     cout<<endl;
   }
