@@ -499,7 +499,7 @@ int main()
     cout<<endl;
   }
   cout<<endl;
-  vector<vector<int>> Mat7=toeplitz_convolve(input,Mat);
+  vector<vector<int>> Mat7=toeplitz_convolve(padded,Mat);
   cout<<"toeplitz convolution by sliding window"<<endl;
   for(int i=0; i<Mat7.size(); i++)
   {
