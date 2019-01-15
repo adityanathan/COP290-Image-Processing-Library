@@ -1,7 +1,3 @@
----
-title: Image Processing Library for COP290
----
-
 # Image Processing Library for COP290
 
 
