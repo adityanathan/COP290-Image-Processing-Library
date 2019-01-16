@@ -25,15 +25,15 @@ If you wish to delete the compiled code, enter the following:
 
    * To subsample a square input matrix of any size with max pooling and average pooling functions:
    
-       `maxpool [matrix1.txt] [number_of_rows] [width] [stride]`
+       `./output.out maxpool [matrix1.txt] [number_of_rows] [width] [stride]`
      
-       `average_pool [matrix1.txt] [number_of_rows] [width] [stride]`
+       `./output.out average_pool [matrix1.txt] [number_of_rows] [width] [stride]`
    
    * To convert a vector of random floats to a vector of probabilities with softmax and sigmoid functions:
    
-       `sigmoid [vector.txt]`
+       `./output.out sigmoid [vector.txt]`
        
-       `softmax [vector.txt]`
+       `./output.out softmax [vector.txt]`
        
    * To obtain convolution of a square input matrix and a square kernel, both matrices of any size and the kernel smaller than the input:
    
@@ -41,21 +41,21 @@ If you wish to delete the compiled code, enter the following:
       
       * Using dot products to convolve:
    
-         `convolve_with_padding [matrix1.txt] [number_of_rows] [matrix2.txt] [number_of_rows]`
+         `./output.out convolve_with_padding [matrix1.txt] [number_of_rows] [matrix2.txt] [number_of_rows]`
           
-         `convolve_without_padding [matrix1.txt] [number_of_rows] [matrix2.txt] [number_of_rows]`
+         `./output.out convolve_without_padding [matrix1.txt] [number_of_rows] [matrix2.txt] [number_of_rows]`
           
       * Using matrix mulltiplication to convolve:
           
-         `convolve_with_padding_matrixmult [matrix1.txt] [number_of_rows] [matrix2.txt] [number_of_rows]`
+         `./output.out convolve_with_padding_matrixmult [matrix1.txt] [number_of_rows] [matrix2.txt] [number_of_rows]`
           
-         `convolve_without_padding_matrixmult [matrix1.txt] [number_of_rows] [matrix2.txt] [number_of_rows]`
+         `./output.out convolve_without_padding_matrixmult [matrix1.txt] [number_of_rows] [matrix2.txt] [number_of_rows]`
   
 ### Instructions for input
     
    * Values have to be representable as 32 bit float
           
-   * Kernel has to have odd dimensions
+   * Kernel has to have odd dimensions in case you want to use input padding
           
    * Vectors have to be stored as single values in each line of the input file
           
