@@ -1,5 +1,5 @@
-output.o : subtask_1.cpp
-	g++ subtask_1.cpp -o output.out
+output.o : main.cpp
+	g++ main.cpp -o output.out
 
 .PHONY : clean
 
