@@ -6,9 +6,6 @@
 #include<string.h>
 using namespace std;
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-//Poorva's code
 vector<float> read_file(std::string s)
 {
     try
@@ -27,19 +24,15 @@ vector<float> read_file(std::string s)
             data=stof(sd);
 
             v.push_back(data);
-            //std::cout<<data<<std::endl;
         }
-        //std::cout<<"end of file reading"<<std::endl;
         return v;
     }
     catch (std::invalid_argument)
     {
-        //cout<<"ha"<<endl;
         throw "Either the data in your file is not valid or you have given a larger number of rows.";
     }
     catch (const char* msg)
     {
-        //cout<<msg<<endl;
         throw msg;
     }
 }
@@ -48,16 +41,12 @@ vector<float> sigmoid(vector<float> v)
 {
     vector<float> ans;
     int size=static_cast<int>(v.size());
-    //std::cout<<size<<std::endl;
     for(int i=0; i<size; i++)
     {
-        //std::cout<<v.get(i)<<std::endl;
         double t1=exp(v[i]*(-1));
         double t2=1/(1+t1);
         float t3=(float)(t2);
         ans.push_back(t3);
-        //std::cout<<"oh";
-        //std::cout<<t3<<std::endl;
     }
     return ans;
 }
@@ -71,7 +60,6 @@ vector<float> softmax(vector<float> v)
     for(int i=0; i<size; i++)
     {
         double t1=exp(v[i]);
-        //std::cout<<t1<<std::endl;
         mid.push_back((float)(t1));
         sum=sum+t1;
     }
@@ -79,7 +67,6 @@ vector<float> softmax(vector<float> v)
     for(int i=0; i<size; i++)
     {
         float t2=(float)(mid[i]/sum);
-        //std::cout<<t2<<std::endl;
         ans.push_back(t2);
     }
     return ans;
@@ -97,7 +84,6 @@ vector<vector<float> > tanh(vector<vector<float> > m)
             double t2=exp(t1);
             double t3=exp(t1*(-1));
             float t4=(float)((t2-t3)/(t2+t3));
-            //std::cout<<t4<<std::endl;
             m[i][j]=t4;
         }
     }
@@ -135,14 +121,14 @@ vector<vector<float> > maxpooling(vector<vector<float> > m, int width, int strid
     {
         rows+=1;
     }
+
     vector<vector<float> > ans;
     for (int i=0; i<rows; i++)
     {
         vector<float> v(rows,0);
         ans.push_back(v);
     }
-    //std::cout<<rows<<std::endl;
-    //vector<vector<float> > ans = vector<vector<float> >(rows);
+
     for (int i=0; i<rows; i++)
     {
         for (int j=0; j<rows; j++)
@@ -150,19 +136,15 @@ vector<vector<float> > maxpooling(vector<vector<float> > m, int width, int strid
             float max=m[i*stride][j*stride];
             for (int iw=i*stride; iw<i*stride+width; iw++)
             {
-                //std::cout<<"iw"<<std::endl;
                 for (int jw=j*stride; jw<j*stride+width; jw++)
                 {
-                    //std::cout<<"iw"<<std::endl;
                     float temp=m[iw][jw];
                     if (max<temp)
                     {
-                        //std::cout<<temp<<std::endl;
                         max=temp;
                     }
                 }
             }
-            //std::cout<<max<<std::endl;
             ans[i][j]=max;
         }
     }
@@ -184,8 +166,6 @@ vector<vector<float> > average_pooling(vector<vector<float> > m, int width, int 
         rows+=1;
     }
 
-    //std::cout<<rows<<std::endl;
-    // Matrix ans=Matrix(rows);
     vector<vector<float> > ans(rows,vector<float>(rows,0));
     for (int i=0; i<rows; i++)
     {
@@ -194,29 +174,19 @@ vector<vector<float> > average_pooling(vector<vector<float> > m, int width, int 
             float sum=0;
             for (int iw=i*stride; iw<i*stride+width; iw++)
             {
-                //std::cout<<"iw"<<std::endl;
                 for (int jw=j*stride; jw<j*stride+width; jw++)
                 {
-                    //std::cout<<"iw"<<std::endl;
                     float temp=m[iw][jw];
                     sum=sum+temp;
                 }
             }
-            //std::cout<<max<<std::endl;
             float average=sum/square;
-            // ans.set(average,i,j);
             ans[i][j]=average;
         }
     }
     return ans;
 
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-//Aditya's Code
 
 vector<vector<float> > reflect_kernel(vector<vector<float> > kernel)
 {
@@ -311,7 +281,6 @@ vector<vector<float> > matrix_multiply(vector<vector<float> > mat1, vector<vecto
     else
     {
         throw "Matrix Dimensions don't match!";
-        //return mat1;
     }
 }
 
@@ -330,16 +299,6 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
         }
     }
 
-    // for(int i = 0; i<padded_kernel.size(); i++)
-    // {
-    //   for(int j=0; j<padded_kernel[0].size(); j++)
-    //   {
-    //     cout<<padded_kernel[i][j]<<" ";
-    //   }
-    //   cout<<endl;
-    // }
-    // cout<<endl;
-
     vector<vector<vector<float> > > h(dim,vector<vector<float> >(dim,vector<float>(m,0)));
 
     for(int z=0; z<dim; z++)
@@ -355,19 +314,6 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
             i++;
         }
     }
-    // for(int a=0; a<h.size();a++)
-    // {
-    //   for(int i = 0; i<h[0].size(); i++)
-    //   {
-    //     for(int j=0; j<h[0][0].size(); j++)
-    //     {
-    //       cout<<h[a][i][j]<<" ";
-    //     }
-    //     cout<<endl;
-    //   }
-    //   cout<<endl;
-    // }
-    // cout<<endl;
 
     vector<vector<float> > h_2d(dim*dim, vector<float>(m*m,0));
     int b=0;//Poorva-I don't know if it is to be made float or not
@@ -391,15 +337,6 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
         }
     }
 
-    // for(int i = 0; i<h_2d.size(); i++)
-    // {
-    //   for(int j=0; j<h_2d[0].size(); j++)
-    //   {
-    //     cout<<h_2d[i][j]<<" ";
-    //   }
-    //   cout<<endl;
-    // }
-    // cout<<endl;
     vector<vector<float> > resized_input(m*m,vector<float>(1,0));
     int p=0;
     for(int i=0; i<m; i++)
@@ -411,19 +348,7 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
         }
     }
 
-    // for(int i = 0; i<resized_input.size(); i++)
-    // {
-    //   for(int j=0; j<resized_input[0].size(); j++)
-    //   {
-    //     cout<<resized_input[i][j]<<" ";
-    //   }
-    //   cout<<endl;
-    // }
-    // cout<<endl;
-
     vector<vector<float> > output = matrix_multiply(h_2d, resized_input);
-
-
 
     vector<vector<float> > resized_output(m+k-1,vector<float>(m+k-1));
 
@@ -434,11 +359,8 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
         {
             resized_output[i][j]=output[p][0];
             p++;
-            // cout<<resized_output[i][j]<<" ";
         }
-        // cout<<endl;
     }
-    // cout<<endl;
     vector<vector<float> > trimmed_output(m-k+1, vector<float>(m-k+1,0));
     for(int i=k-1;i<m;i++)
     {
@@ -467,10 +389,6 @@ vector<vector<float> > read_matrix(string s, int rows)
             mat.push_back(v);
         }
         float data;
-        //cout<<3<<endl;
-        //Will read only till max capacity
-        //while(getline(infile, str))
-        //{
         for (int i=0; i<rows;i++)
         {
             for (int j=0; j<rows; j++)
@@ -478,11 +396,8 @@ vector<vector<float> > read_matrix(string s, int rows)
                 getline(infile, str);
                 data=stof(str);
                 mat[j][i]=data;
-                //std::cout<<data<<std::endl;
             }
         }
-        //std::cout<<data<<std::endl;
-        //}
         return mat;
     } catch (std::invalid_argument) {
         throw "The data in the file provided by you is not valid";
@@ -492,144 +407,6 @@ vector<vector<float> > read_matrix(string s, int rows)
     }
 
 }
-//////////////////////////////////////////////////////////////////////////////////
-
-/*int main()
-{
-    vector < vector <float> > Mat(3, std::vector<float>(3, 0));
-    vector < vector <float> > input(5, std::vector<float>(5, 0));
-    int t=0;//Poorva-I don't know if it is to be converted to float or not
-    cout<<"kernel"<<endl;
-    for(int i=0; i<3; i++)
-    {
-        for(int j=0;j<3;j++)
-        {
-            Mat[i][j]=t++;
-            cout<<t-1;
-        }
-        cout<<endl;
-    }
-    cout<<endl;
-    cout<<"input_matrix"<<endl;
-    t=0;
-    for(int i=0; i<5; i++)
-    {
-        for(int j=0;j<5;j++)
-        {
-            input[i][j]=t++;
-            cout<<t-1<<" ";
-        }
-        cout<<endl;
-    }
-    cout<<endl;
-
-    vector<vector<float> > padded = padding(input, 1);
-    cout<<"padded input matrix"<<endl;
-    for(int i=0; i<7; i++)
-    {
-        for(int j=0;j<7;j++)
-        {
-            cout<<padded[i][j];
-        }
-        cout<<endl;
-    }
-    cout<<endl;
-
-    vector < vector <float> > Mat2 = reflect_kernel(Mat);
-    cout<<"reflected kernel"<<endl;
-    for(int i=0; i<3; i++)
-    {
-        for(int j=0;j<3;j++)
-        {
-            cout<<Mat2[i][j];
-        }
-        cout<<endl;
-    }
-    cout<<endl;
-    vector < vector <float> > Mat3 = convolve(input,Mat);
-    cout<<"normal convolution by sliding window"<<endl;
-    for(int i=0; i<3; i++)
-    {
-        for(int j=0;j<3;j++)
-        {
-            cout<<Mat3[i][j]<<" ";
-        }
-        cout<<endl;
-    }
-    cout<<endl;
-    Mat3 = convolve(padded,Mat);
-    cout<<"normal convolution by sliding window with padding"<<endl;
-    for(int i=0; i<5; i++)
-    {
-        for(int j=0;j<5;j++)
-        {
-            cout<<Mat3[i][j]<<" ";
-        }
-        cout<<endl;
-    }
-    cout<<endl;
-    vector<vector<float> > Mat7=toeplitz_convolve(input,Mat);
-    vector<vector<float> > Mat8=toeplitz_convolve(padded, Mat);
-    cout<<"toeplitz convolution by sliding window"<<endl;
-    for(int i=0; i<Mat8.size(); i++)
-    {
-        for(int j=0;j<Mat8[0].size();j++)
-        {
-            cout<<Mat8[i][j]<<" ";
-        }
-        cout<<endl;
-    }
-    cout<<endl;
-    /////////////////////
-    // insert code here...
-    //Vector v=read_file("afile.txt");
-    //Vector ans=sigmoid(v);
-    //Vector ans2=softmax(v);
-
-    vector<vector<float> > m(5,vector<float>(5,0));
-    m[0][0]=-1;
-    m[0][1]=2;
-    m[0][2]=3;
-    m[0][3]=4;
-    m[0][4]=-1;
-    m[1][0]=2;
-    m[1][1]=3;
-    m[1][2]=4;
-    m[1][3]=-1;
-    m[1][4]=2;
-    m[2][0]=3;
-    m[2][1]=4;
-    m[2][2]=-1;
-    m[2][3]=2;
-    m[2][4]=3;
-    m[3][0]=4;
-    m[3][1]=-1;
-    m[3][2]=2;
-    m[3][3]=3;
-    m[3][4]=4;
-    m[4][0]=-1;
-    m[4][1]=2;
-    m[4][2]=3;
-    m[4][3]=4;
-    m[4][4]=5;
-    //Matrix t=relu(m);
-    read_file("afile.txt");
-    vector<vector<float> > ans=read_matrix("afile.txt", 3);
-    //int n=static_cast<int>(ans.size());
-    //std::cout<<n<<std::endl;
-    for(int i=0; i<3; i++)
-    {
-        for(int j=0;j<3;j++)
-        {
-            cout<<ans[i][j]<<" ";
-        }
-        cout<<endl;
-    }
-    cout<<endl;
-    //////////////////////
-
-    return 0;
-}*/
 
 int main(int argc, char *argv[])
 {
