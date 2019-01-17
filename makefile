@@ -1,5 +1,5 @@
 output.o : main.cpp
-	g++ main.cpp -o output.out
+	g++ -std=c++11 main.cpp -o output.out
 
 .PHONY : clean
 
