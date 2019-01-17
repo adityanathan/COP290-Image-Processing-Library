@@ -157,7 +157,7 @@ vector<vector<float> > average_pooling(vector<vector<float> > m, int width, int 
     float t1=((n-width)%stride);
     if (t1!=0)
     {
-        std::cout<<"The stride and width given by you are not an appropriate choice, still the output will be"<<std::endl;
+        throw "The stride and width given by you are not an appropriate choice";
     }
     float square=width*width;
     int rows=0;
