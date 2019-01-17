@@ -22,7 +22,7 @@ vector<float> read_file(std::string s)
         while(getline(infile, sd))
         {
             data=stof(sd);
-
+            
             v.push_back(data);
         }
         return v;
@@ -63,14 +63,14 @@ vector<float> softmax(vector<float> v)
         mid.push_back((float)(t1));
         sum=sum+t1;
     }
-
+    
     for(int i=0; i<size; i++)
     {
         float t2=(float)(mid[i]/sum);
         ans.push_back(t2);
     }
     return ans;
-
+    
 }
 
 vector<vector<float> > tanh(vector<vector<float> > m)
@@ -113,22 +113,22 @@ vector<vector<float> > maxpooling(vector<vector<float> > m, int width, int strid
     float t1=((n-width)%stride);
     if (t1!=0)
     {
-        std::cout<<"The stride and width given by you are not an appropriate choice, still the output will be"<<std::endl;
+        throw "The stride and width given by you are not an appropriate choice";
     }
-
+    
     int rows=0;
     while ((width+rows*stride)<=n)
     {
         rows+=1;
     }
-
+    
     vector<vector<float> > ans;
     for (int i=0; i<rows; i++)
     {
         vector<float> v(rows,0);
         ans.push_back(v);
     }
-
+    
     for (int i=0; i<rows; i++)
     {
         for (int j=0; j<rows; j++)
@@ -165,7 +165,7 @@ vector<vector<float> > average_pooling(vector<vector<float> > m, int width, int 
     {
         rows+=1;
     }
-
+    
     vector<vector<float> > ans(rows,vector<float>(rows,0));
     for (int i=0; i<rows; i++)
     {
@@ -185,7 +185,7 @@ vector<vector<float> > average_pooling(vector<vector<float> > m, int width, int 
         }
     }
     return ans;
-
+    
 }
 
 vector<vector<float> > reflect_kernel(vector<vector<float> > kernel)
@@ -202,7 +202,7 @@ vector<vector<float> > reflect_kernel(vector<vector<float> > kernel)
             reflected_kernel[j][i]=temp;
         }
     }
-
+    
     for(int i=0; i<rows;i++)
     {
         for(int j=rows - i - 1;j<rows;j++)
@@ -212,7 +212,7 @@ vector<vector<float> > reflect_kernel(vector<vector<float> > kernel)
             reflected_kernel[rows - j-1][rows - i-1] = temp;
         }
     }
-
+    
     return reflected_kernel;
 }
 
@@ -222,10 +222,10 @@ vector<vector<float> > convolve(vector<vector<float> > matrix, vector<vector<flo
     int m =static_cast<int>( matrix.size());
     int k = static_cast<int>(kernel.size());
     vector < vector <float> > convoluted_matrix(m-k+1, std::vector<float>(m-k+1, 0));
-
+    
     int x, y, i, j;
     float sum;
-
+    
     for(x=0;x<m-k+1;x++)
     {
         for(y=0;y<m-k+1;y++)
@@ -249,7 +249,7 @@ vector<vector<float> > padding(vector<vector<float> > matrix, int pad)
     int m = static_cast<int>(matrix.size());
     int dim = m+(2*pad);
     vector < vector <float> > padded_matrix(dim, std::vector<float>(dim, 0));
-
+    
     for(int i=0; i<dim; i++)
     {
         for(int j=0; j<dim; j++)
@@ -290,7 +290,7 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
     int k = static_cast<int>(kernel.size());
     int dim = m+k-1;
     vector<vector<float> > padded_kernel(dim, vector<float>(dim,0));
-
+    
     for(int i = 0; i<k; i++)
     {
         for(int j=0; j<k; j++)
@@ -298,9 +298,9 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
             padded_kernel[i][j]=kernel[i][j];
         }
     }
-
+    
     vector<vector<vector<float> > > h(dim,vector<vector<float> >(dim,vector<float>(m,0)));
-
+    
     for(int z=0; z<dim; z++)
     {
         vector<float> a = padded_kernel[z];
@@ -314,7 +314,7 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
             i++;
         }
     }
-
+    
     vector<vector<float> > h_2d(dim*dim, vector<float>(m*m,0));
     int b=0;//Poorva-I don't know if it is to be made float or not
     for(int i=0; i<dim*dim; i+=dim)
@@ -336,7 +336,7 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
             b--;
         }
     }
-
+    
     vector<vector<float> > resized_input(m*m,vector<float>(1,0));
     int p=0;
     for(int i=0; i<m; i++)
@@ -347,11 +347,11 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
             p++;
         }
     }
-
+    
     vector<vector<float> > output = matrix_multiply(h_2d, resized_input);
-
+    
     vector<vector<float> > resized_output(m+k-1,vector<float>(m+k-1));
-
+    
     p=0;
     for(int i=0;i<m+k-1;i++)
     {
@@ -405,7 +405,7 @@ vector<vector<float> > read_matrix(string s, int rows)
     {
         throw msg;
     }
-
+    
 }
 
 int main(int argc, char *argv[])
@@ -445,6 +445,10 @@ int main(int argc, char *argv[])
             if (strcmp(argv[1], "relu")==0)
             {
                 int rows=stoi(argv[3]);
+                if (rows<0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
                 vector<vector<float> > input=read_matrix(argv[2], rows);
                 //cout<<argv[2]<<endl;
                 vector<vector<float> > ans=relu(input);
@@ -452,7 +456,7 @@ int main(int argc, char *argv[])
                 {
                     for(int j=0;j<rows;j++)
                     {
-                        cout<<input[i][j]<<" ";
+                        cout<<ans[i][j]<<" ";
                     }
                     cout<<endl;
                 }
@@ -460,6 +464,10 @@ int main(int argc, char *argv[])
             else if(strcmp(argv[1], "tanh")==0)
             {
                 int rows=stoi(argv[3]);
+                if (rows<0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
                 vector<vector<float> > input=read_matrix(argv[2], rows);
                 vector<vector<float> > ans=tanh(input);
                 for(int i=0; i<rows; i++)
@@ -483,6 +491,10 @@ int main(int argc, char *argv[])
                 int rows=stoi(argv[3]);
                 int width=stoi(argv[4]);
                 int stride=stoi(argv[5]);
+                if (rows<0 || width<0 || stride<=0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
                 vector<vector<float> > input=read_matrix(argv[2], rows);
                 vector<vector<float> > ans=maxpooling(input, width, stride);
                 int ans_rows=static_cast<int>(ans.size());
@@ -500,6 +512,10 @@ int main(int argc, char *argv[])
                 int rows=stoi(argv[3]);
                 int width=stoi(argv[4]);
                 int stride=stoi(argv[5]);
+                if (rows<0 || width<0 || stride<=0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
                 vector<vector<float> > input= read_matrix(argv[2], rows);
                 vector<vector<float> > ans= average_pooling(input, width, stride);
                 int ans_rows=static_cast<int>(ans.size());
@@ -516,6 +532,10 @@ int main(int argc, char *argv[])
             {
                 int m_rows=static_cast<int>(stoi(argv[3]));
                 int k_rows=static_cast<int>(stoi(argv[5]));
+                if (m_rows<0 || k_rows<0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
                 if (m_rows>=k_rows)
                 {
                     vector<vector<float> > input= read_matrix(argv[2], m_rows);
@@ -540,6 +560,10 @@ int main(int argc, char *argv[])
             {
                 int m_rows=static_cast<int>(stoi(argv[3]));
                 int k_rows=static_cast<int>(stoi(argv[5]));
+                if (m_rows<0 || k_rows<0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
                 if (m_rows>=k_rows)
                 {
                     if (k_rows%2==1)
@@ -573,6 +597,10 @@ int main(int argc, char *argv[])
             {
                 int m_rows=static_cast<int>(stoi(argv[3]));
                 int k_rows=static_cast<int>(stoi(argv[5]));
+                if (m_rows<0 || k_rows<0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
                 if (m_rows>=k_rows)
                 {
                     if (k_rows%2==1)
@@ -601,12 +629,16 @@ int main(int argc, char *argv[])
                 {
                     throw "The kernel matrix should be smalller than input matrix.";
                 }
-
+                
             }
             else if (strcmp(argv[1], "convolve_without_padding_matrixmult")==0)
             {
                 int m_rows=static_cast<int>(stoi(argv[3]));
                 int k_rows=static_cast<int>(stoi(argv[5]));
+                if (m_rows<0 || k_rows<0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
                 if (m_rows>=k_rows)
                 {
                     vector<vector<float> > input= read_matrix(argv[2], m_rows);
