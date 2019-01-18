@@ -157,7 +157,7 @@ vector<vector<float> > average_pooling(vector<vector<float> > m, int width, int 
     float t1=((n-width)%stride);
     if (t1!=0)
     {
-        throw "The stride and width given by you are not an appropriate choice";
+        std::cout<<"The stride and width given by you are not an appropriate choice, still the output will be"<<std::endl;
     }
     float square=width*width;
     int rows=0;
@@ -418,22 +418,30 @@ int main(int argc, char *argv[])
                 vector<float> input=read_file(argv[2]);
                 vector<float> ans=sigmoid(input);
                 int n=static_cast<int>(ans.size());
+                ofstream outfile;
+                outfile.open("output.txt");
                 for(int i=0; i<n; i++)
                 {
                     cout<<ans[i]<<endl;
+                    outfile<<ans[i]<<endl;
                 }
-                cout<<endl;
+                //cout<<endl;
+                outfile.close();
             }
             else if (strcmp(argv[1], "softmax")==0)
             {
                 vector<float> input=read_file(argv[2]);
                 vector<float> ans=softmax(input);
                 int n=static_cast<int>(ans.size());
+                ofstream outfile;
+                outfile.open("output.txt");
                 for(int i=0; i<n; i++)
                 {
                     cout<<ans[i]<<endl;
+                    outfile<<ans[i]<<endl;
                 }
-                cout<<endl;
+                //cout<<endl;
+                outfile.close();
             }
             else
             {
@@ -460,6 +468,17 @@ int main(int argc, char *argv[])
                     }
                     cout<<endl;
                 }
+                ofstream outfile;
+                outfile.open("output.txt");
+                for(int i=0; i<rows; i++)
+                {
+                    for(int j=0;j<rows;j++)
+                    {
+                        outfile<<ans[j][i]<<endl;
+                    }
+                    //cout<<endl;
+                }
+                outfile.close();
             }
             else if(strcmp(argv[1], "tanh")==0)
             {
@@ -478,6 +497,17 @@ int main(int argc, char *argv[])
                     }
                     cout<<endl;
                 }
+                ofstream outfile;
+                outfile.open("output.txt");
+                for(int i=0; i<rows; i++)
+                {
+                    for(int j=0;j<rows;j++)
+                    {
+                        outfile<<ans[j][i]<<endl;
+                    }
+                    //cout<<endl;
+                }
+                outfile.close();
             }
             else
             {
@@ -491,9 +521,13 @@ int main(int argc, char *argv[])
                 int rows=stoi(argv[3]);
                 int width=stoi(argv[4]);
                 int stride=stoi(argv[5]);
-                if (rows<0 || width<0 || stride<=0)
+                if (rows<0 || width<0)
                 {
                     throw "The number of rows should be non-negative";
+                }
+                if (stride<=0)
+                {
+                    throw "The stride has to be a positive number";
                 }
                 vector<vector<float> > input=read_matrix(argv[2], rows);
                 vector<vector<float> > ans=maxpooling(input, width, stride);
@@ -506,15 +540,30 @@ int main(int argc, char *argv[])
                     }
                     cout<<endl;
                 }
+                ofstream outfile;
+                outfile.open("output.txt");
+                for(int i=0; i<ans_rows; i++)
+                {
+                    for(int j=0;j<ans_rows;j++)
+                    {
+                        outfile<<ans[j][i]<<endl;
+                    }
+                    //cout<<endl;
+                }
+                outfile.close();
             }
             else if (strcmp(argv[1], "average_pool")==0)
             {
                 int rows=stoi(argv[3]);
                 int width=stoi(argv[4]);
                 int stride=stoi(argv[5]);
-                if (rows<0 || width<0 || stride<=0)
+                if (rows<0 || width<0)
                 {
                     throw "The number of rows should be non-negative";
+                }
+                if (stride<=0)
+                {
+                    throw "The stride has to be a positive number";
                 }
                 vector<vector<float> > input= read_matrix(argv[2], rows);
                 vector<vector<float> > ans= average_pooling(input, width, stride);
@@ -527,6 +576,17 @@ int main(int argc, char *argv[])
                     }
                     cout<<endl;
                 }
+                ofstream outfile;
+                outfile.open("output.txt");
+                for(int i=0; i<ans_rows; i++)
+                {
+                    for(int j=0;j<ans_rows;j++)
+                    {
+                        outfile<<ans[j][i]<<endl;
+                    }
+                    //cout<<endl;
+                }
+                outfile.close();
             }
             else if (strcmp(argv[1], "convolve_without_padding")==0)
             {
@@ -550,6 +610,17 @@ int main(int argc, char *argv[])
                         }
                         cout<<endl;
                     }
+                    ofstream outfile;
+                    outfile.open("output.txt");
+                    for(int i=0; i<ans_rows; i++)
+                    {
+                        for(int j=0;j<ans_rows;j++)
+                        {
+                            outfile<<ans[j][i]<<endl;
+                        }
+                        //cout<<endl;
+                    }
+                    outfile.close();
                 }
                 else
                 {
@@ -582,6 +653,17 @@ int main(int argc, char *argv[])
                             }
                             cout<<endl;
                         }
+                        ofstream outfile;
+                        outfile.open("output.txt");
+                        for(int i=0; i<ans_rows; i++)
+                        {
+                            for(int j=0;j<ans_rows;j++)
+                            {
+                                outfile<<ans[j][i]<<endl;
+                            }
+                            //cout<<endl;
+                        }
+                        outfile.close();
                     }
                     else
                     {
@@ -619,6 +701,17 @@ int main(int argc, char *argv[])
                             }
                             cout<<endl;
                         }
+                        ofstream outfile;
+                        outfile.open("output.txt");
+                        for(int i=0; i<ans_rows; i++)
+                        {
+                            for(int j=0;j<ans_rows;j++)
+                            {
+                                outfile<<ans[j][i]<<endl;
+                            }
+                            //cout<<endl;
+                        }
+                        outfile.close();
                     }
                     else
                     {
@@ -653,6 +746,17 @@ int main(int argc, char *argv[])
                         }
                         cout<<endl;
                     }
+                    ofstream outfile;
+                    outfile.open("output.txt");
+                    for(int i=0; i<ans_rows; i++)
+                    {
+                        for(int j=0;j<ans_rows;j++)
+                        {
+                            outfile<<ans[j][i]<<endl;
+                        }
+                        //cout<<endl;
+                    }
+                    outfile.close();
                 }
                 else
                 {
@@ -678,7 +782,7 @@ int main(int argc, char *argv[])
     }
     catch (...)
     {
-        cout<<"There is something wrong with the arguments you have provided or the files you are using to input matrices/vectors"<<endl;
+        cout<<"Thera is something wrong with the arguments you have provided or the files you are using to input matrices/vectors"<<endl;
         cout<<"Please refer to README for further help"<<endl;
     }
     return 0;
