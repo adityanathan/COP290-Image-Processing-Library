@@ -66,3 +66,6 @@ If you wish to delete the compiled code, enter the following:
  **Note**: The header file provided has not been linked to the cpp file and it is meant only as reference for the user for the various functions which have been used in the code.
 
  **Note**: Sample input files have been provided. The output will be displayed on the terminal and will be given in a text file output.txt in the same format as specified for input: vectors as single values in each line of the output file and matrices in column major order in each line of the output file
+
+ export LD_LIBRARY_PATH=/opt/OpenBLAS/lib/
+ export MKLROOT=~/intel/mkl/

@@ -1,9 +1,13 @@
-#include<string>
-#include<iostream>
-#include<vector>
+#include <string>
+#include <iostream>
+#include <vector>
 #include <fstream>
 #include <cmath>
-#include<string.h>
+#include <string.h>
+#include "functions.h"
+#include <chrono>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 
 vector<float> read_file(std::string s)
@@ -22,7 +26,7 @@ vector<float> read_file(std::string s)
         while(getline(infile, sd))
         {
             data=stof(sd);
-            
+
             v.push_back(data);
         }
         return v;
@@ -63,14 +67,14 @@ vector<float> softmax(vector<float> v)
         mid.push_back((float)(t1));
         sum=sum+t1;
     }
-    
+
     for(int i=0; i<size; i++)
     {
         float t2=(float)(mid[i]/sum);
         ans.push_back(t2);
     }
     return ans;
-    
+
 }
 
 vector<vector<float> > tanh(vector<vector<float> > m)
@@ -115,20 +119,20 @@ vector<vector<float> > maxpooling(vector<vector<float> > m, int width, int strid
     {
         throw "The stride and width given by you are not an appropriate choice";
     }
-    
+
     int rows=0;
     while ((width+rows*stride)<=n)
     {
         rows+=1;
     }
-    
+
     vector<vector<float> > ans;
     for (int i=0; i<rows; i++)
     {
         vector<float> v(rows,0);
         ans.push_back(v);
     }
-    
+
     for (int i=0; i<rows; i++)
     {
         for (int j=0; j<rows; j++)
@@ -165,7 +169,7 @@ vector<vector<float> > average_pooling(vector<vector<float> > m, int width, int 
     {
         rows+=1;
     }
-    
+
     vector<vector<float> > ans(rows,vector<float>(rows,0));
     for (int i=0; i<rows; i++)
     {
@@ -185,7 +189,7 @@ vector<vector<float> > average_pooling(vector<vector<float> > m, int width, int 
         }
     }
     return ans;
-    
+
 }
 
 vector<vector<float> > reflect_kernel(vector<vector<float> > kernel)
@@ -202,7 +206,7 @@ vector<vector<float> > reflect_kernel(vector<vector<float> > kernel)
             reflected_kernel[j][i]=temp;
         }
     }
-    
+
     for(int i=0; i<rows;i++)
     {
         for(int j=rows - i - 1;j<rows;j++)
@@ -212,7 +216,7 @@ vector<vector<float> > reflect_kernel(vector<vector<float> > kernel)
             reflected_kernel[rows - j-1][rows - i-1] = temp;
         }
     }
-    
+
     return reflected_kernel;
 }
 
@@ -222,10 +226,10 @@ vector<vector<float> > convolve(vector<vector<float> > matrix, vector<vector<flo
     int m =static_cast<int>( matrix.size());
     int k = static_cast<int>(kernel.size());
     vector < vector <float> > convoluted_matrix(m-k+1, std::vector<float>(m-k+1, 0));
-    
+
     int x, y, i, j;
     float sum;
-    
+
     for(x=0;x<m-k+1;x++)
     {
         for(y=0;y<m-k+1;y++)
@@ -249,7 +253,7 @@ vector<vector<float> > padding(vector<vector<float> > matrix, int pad)
     int m = static_cast<int>(matrix.size());
     int dim = m+(2*pad);
     vector < vector <float> > padded_matrix(dim, std::vector<float>(dim, 0));
-    
+
     for(int i=0; i<dim; i++)
     {
         for(int j=0; j<dim; j++)
@@ -284,13 +288,19 @@ vector<vector<float> > matrix_multiply(vector<vector<float> > mat1, vector<vecto
     }
 }
 
-vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vector<vector<float> > kernel)
+struct multiple_return_variables
+{
+    vector < vector <float> > matrix;
+    std::chrono::duration<double> elapsed;
+};
+
+vector<vector<float>> toeplitz_convolve(vector<vector<float> > matrix, vector<vector<float> > kernel, int option)
 {
     int m = static_cast<int>(matrix.size());
     int k = static_cast<int>(kernel.size());
     int dim = m+k-1;
     vector<vector<float> > padded_kernel(dim, vector<float>(dim,0));
-    
+
     for(int i = 0; i<k; i++)
     {
         for(int j=0; j<k; j++)
@@ -298,9 +308,9 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
             padded_kernel[i][j]=kernel[i][j];
         }
     }
-    
+
     vector<vector<vector<float> > > h(dim,vector<vector<float> >(dim,vector<float>(m,0)));
-    
+
     for(int z=0; z<dim; z++)
     {
         vector<float> a = padded_kernel[z];
@@ -314,7 +324,7 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
             i++;
         }
     }
-    
+
     vector<vector<float> > h_2d(dim*dim, vector<float>(m*m,0));
     int b=0;//Poorva-I don't know if it is to be made float or not
     for(int i=0; i<dim*dim; i+=dim)
@@ -336,7 +346,7 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
             b--;
         }
     }
-    
+
     vector<vector<float> > resized_input(m*m,vector<float>(1,0));
     int p=0;
     for(int i=0; i<m; i++)
@@ -347,11 +357,37 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
             p++;
         }
     }
-    
-    vector<vector<float> > output = matrix_multiply(h_2d, resized_input);
-    
+    vector<vector<float> > output;
+    //auto start = chrono::high_resolution_clock::now();
+    if (option==1)
+    {
+        output = matrix_multiply(h_2d, resized_input);
+        //cout<<"normal"<<endl;
+    }
+    else if (option==2)
+    {
+        output = matrix_multiply_with_mkl(h_2d, resized_input);
+        //cout<<"mkl"<<endl;
+    }
+    else if (option==3)
+    {
+        output = matrix_multiply_with_openblas(h_2d, resized_input);
+        //cout<<"openblas"<<endl;
+    }
+    else if(option==4)
+    {
+        //cout<<"starting matrix multiply"<<endl;
+        output = matrix_multiply_with_pthreads(h_2d, resized_input);
+        //vector<vector<float> > mat3 = matrix_multiply_with_pthreads(h_2d, resized_input);
+        //cout<<"pthreads"<<endl;
+    }
+
+    //auto finish = std::chrono::high_resolution_clock::now();
+    //std::chrono::duration<double> elapsed = finish - start;
+    //double exec_time = elapsed.count();
+
     vector<vector<float> > resized_output(m+k-1,vector<float>(m+k-1));
-    
+
     p=0;
     for(int i=0;i<m+k-1;i++)
     {
@@ -369,7 +405,12 @@ vector < vector <float> > toeplitz_convolve(vector<vector<float> > matrix, vecto
             trimmed_output[i-k+1][j-k+1]=resized_output[i][j];
         }
     }
-    return trimmed_output;
+    // cout<<"Execution time for matrix multiplication in seconds= "<<elapsed.count()<<endl<<endl;
+     return trimmed_output;
+    // multiple_return_variables ret;
+    // ret.matrix=trimmed_output;
+    //ret.elapsed=elapsed;
+    // return ret;
 }
 
 vector<vector<float> > read_matrix(string s, int rows)
@@ -405,7 +446,7 @@ vector<vector<float> > read_matrix(string s, int rows)
     {
         throw msg;
     }
-    
+
 }
 
 int main(int argc, char *argv[])
@@ -691,7 +732,12 @@ int main(int argc, char *argv[])
                         vector<vector<float> > kernel=read_matrix(argv[4], k_rows);
                         int pad=(k_rows-1)/2;
                         vector<vector<float> > padded_input=padding(input, pad);
-                        vector<vector<float> > ans=toeplitz_convolve(padded_input, kernel);
+
+                        clock_t start = clock();
+                        vector<vector<float> > ans=toeplitz_convolve(padded_input, kernel, 1);
+                        clock_t stop = clock();
+
+
                         int ans_rows=static_cast<int>(ans.size());
                         for(int i=0; i<ans_rows; i++)
                         {
@@ -701,6 +747,7 @@ int main(int argc, char *argv[])
                             }
                             cout<<endl;
                         }
+                        cout<<endl<<"Running time for convolution = "<<(double)(stop-start)/(double)(CLOCKS_PER_SEC)<<endl;
                         ofstream outfile;
                         outfile.open("output.txt");
                         for(int i=0; i<ans_rows; i++)
@@ -722,7 +769,170 @@ int main(int argc, char *argv[])
                 {
                     throw "The kernel matrix should be smalller than input matrix.";
                 }
-                
+
+            }
+            else if (strcmp(argv[1], "convolve_with_padding_matrixmult_with_mkl")==0)
+            {
+                int m_rows=static_cast<int>(stoi(argv[3]));
+                int k_rows=static_cast<int>(stoi(argv[5]));
+                if (m_rows<0 || k_rows<0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
+                if (m_rows>=k_rows)
+                {
+                    if (k_rows%2==1)
+                    {
+                        vector<vector<float> > input=read_matrix(argv[2], m_rows);
+                        vector<vector<float> > kernel=read_matrix(argv[4], k_rows);
+                        int pad=(k_rows-1)/2;
+                        vector<vector<float> > padded_input=padding(input, pad);
+
+                        clock_t start = clock();
+                        vector<vector<float> > ans=toeplitz_convolve(padded_input, kernel, 2);
+                        clock_t stop = clock();
+
+                        int ans_rows=static_cast<int>(ans.size());
+                        for(int i=0; i<ans_rows; i++)
+                        {
+                            for(int j=0;j<ans_rows;j++)
+                            {
+                                cout<<ans[i][j]<<" ";
+                            }
+                            cout<<endl;
+                        }
+                        cout<<endl<<"Running time for convolution = "<<(double)(stop-start)/(double)(CLOCKS_PER_SEC)<<endl;
+
+                        ofstream outfile;
+                        outfile.open("output.txt");
+                        for(int i=0; i<ans_rows; i++)
+                        {
+                            for(int j=0;j<ans_rows;j++)
+                            {
+                                outfile<<ans[j][i]<<endl;
+                            }
+                            //cout<<endl;
+                        }
+                        outfile.close();
+                    }
+                    else
+                    {
+                        throw "If kernel contains odd rows, padding is not possible.";
+                    }
+                }
+                else
+                {
+                    throw "The kernel matrix should be smalller than input matrix.";
+                }
+
+            }
+            else if (strcmp(argv[1], "convolve_with_padding_matrixmult_with_openblas")==0)
+            {
+                int m_rows=static_cast<int>(stoi(argv[3]));
+                int k_rows=static_cast<int>(stoi(argv[5]));
+                if (m_rows<0 || k_rows<0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
+                if (m_rows>=k_rows)
+                {
+                    if (k_rows%2==1)
+                    {
+                        vector<vector<float> > input=read_matrix(argv[2], m_rows);
+                        vector<vector<float> > kernel=read_matrix(argv[4], k_rows);
+                        int pad=(k_rows-1)/2;
+                        vector<vector<float> > padded_input=padding(input, pad);
+
+                        clock_t start = clock();
+                        vector<vector<float> > ans=toeplitz_convolve(padded_input, kernel, 3);
+                        clock_t stop = clock();
+
+                        int ans_rows=static_cast<int>(ans.size());
+                        for(int i=0; i<ans_rows; i++)
+                        {
+                            for(int j=0;j<ans_rows;j++)
+                            {
+                                cout<<ans[i][j]<<" ";
+                            }
+                            cout<<endl;
+                        }
+                        cout<<endl<<"Running time for convolution = "<<(double)(stop-start)/(double)(CLOCKS_PER_SEC)<<endl;
+                        ofstream outfile;
+                        outfile.open("output.txt");
+                        for(int i=0; i<ans_rows; i++)
+                        {
+                            for(int j=0;j<ans_rows;j++)
+                            {
+                                outfile<<ans[j][i]<<endl;
+                            }
+                            //cout<<endl;
+                        }
+                        outfile.close();
+                    }
+                    else
+                    {
+                        throw "If kernel contains odd rows, padding is not possible.";
+                    }
+                }
+                else
+                {
+                    throw "The kernel matrix should be smalller than input matrix.";
+                }
+
+            }
+            else if (strcmp(argv[1], "convolve_with_padding_matrixmult_with_pthreads")==0)
+            {
+                int m_rows=static_cast<int>(stoi(argv[3]));
+                int k_rows=static_cast<int>(stoi(argv[5]));
+                if (m_rows<0 || k_rows<0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
+                if (m_rows>=k_rows)
+                {
+                    if (k_rows%2==1)
+                    {
+                        vector<vector<float> > input=read_matrix(argv[2], m_rows);
+                        vector<vector<float> > kernel=read_matrix(argv[4], k_rows);
+                        int pad=(k_rows-1)/2;
+                        vector<vector<float> > padded_input=padding(input, pad);
+
+                        clock_t start = clock();
+                        vector<vector<float> > ans=toeplitz_convolve(padded_input, kernel, 4);
+                        clock_t stop = clock();
+
+                        int ans_rows=static_cast<int>(ans.size());
+                        for(int i=0; i<ans_rows; i++)
+                        {
+                            for(int j=0;j<ans_rows;j++)
+                            {
+                                cout<<ans[i][j]<<" ";
+                            }
+                            cout<<endl;
+                        }
+                        cout<<endl<<"Running time for convolution = "<<(double)(stop-start)/(double)(CLOCKS_PER_SEC)<<endl;
+                        ofstream outfile;
+                        outfile.open("output.txt");
+                        for(int i=0; i<ans_rows; i++)
+                        {
+                            for(int j=0;j<ans_rows;j++)
+                            {
+                                outfile<<ans[j][i]<<endl;
+                            }
+                            //cout<<endl;
+                        }
+                        outfile.close();
+                    }
+                    else
+                    {
+                        throw "If kernel contains odd rows, padding is not possible.";
+                    }
+                }
+                else
+                {
+                    throw "The kernel matrix should be smalller than input matrix.";
+                }
+
             }
             else if (strcmp(argv[1], "convolve_without_padding_matrixmult")==0)
             {
@@ -736,7 +946,11 @@ int main(int argc, char *argv[])
                 {
                     vector<vector<float> > input= read_matrix(argv[2], m_rows);
                     vector<vector<float> > kernel=read_matrix(argv[4], k_rows);
-                    vector<vector<float> > ans=toeplitz_convolve(input, kernel);
+
+                    clock_t start = clock();
+                    vector<vector<float> > ans=toeplitz_convolve(input, kernel, 1);
+                    clock_t stop = clock();
+
                     int ans_rows=static_cast<int>(ans.size());
                     for(int i=0; i<ans_rows; i++)
                     {
@@ -746,6 +960,139 @@ int main(int argc, char *argv[])
                         }
                         cout<<endl;
                     }
+                    cout<<endl<<"Running time for convolution = "<<(double)(stop-start)/(double)(CLOCKS_PER_SEC)<<endl;
+                    ofstream outfile;
+                    outfile.open("output.txt");
+                    for(int i=0; i<ans_rows; i++)
+                    {
+                        for(int j=0;j<ans_rows;j++)
+                        {
+                            outfile<<ans[j][i]<<endl;
+                        }
+                        //cout<<endl;
+                    }
+                    outfile.close();
+                }
+                else
+                {
+                    throw "The kernel matrix should be smaller than input matrix.";
+                }
+            }
+            else if (strcmp(argv[1], "convolve_without_padding_matrixmult_with_mkl")==0)
+            {
+                int m_rows=static_cast<int>(stoi(argv[3]));
+                int k_rows=static_cast<int>(stoi(argv[5]));
+                if (m_rows<0 || k_rows<0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
+                if (m_rows>=k_rows)
+                {
+                    vector<vector<float> > input= read_matrix(argv[2], m_rows);
+                    vector<vector<float> > kernel=read_matrix(argv[4], k_rows);
+
+                    clock_t start = clock();
+                    vector<vector<float> > ans=toeplitz_convolve(input, kernel, 2);
+                    clock_t stop = clock();
+
+                    int ans_rows=static_cast<int>(ans.size());
+                    for(int i=0; i<ans_rows; i++)
+                    {
+                        for(int j=0;j<ans_rows;j++)
+                        {
+                            cout<<ans[i][j]<<" ";
+                        }
+                        cout<<endl;
+                    }
+                    cout<<endl<<"Running time for convolution = "<<(double)(stop-start)/(double)(CLOCKS_PER_SEC)<<endl;
+                    ofstream outfile;
+                    outfile.open("output.txt");
+                    for(int i=0; i<ans_rows; i++)
+                    {
+                        for(int j=0;j<ans_rows;j++)
+                        {
+                            outfile<<ans[j][i]<<endl;
+                        }
+                        //cout<<endl;
+                    }
+                    outfile.close();
+                }
+                else
+                {
+                    throw "The kernel matrix should be smaller than input matrix.";
+                }
+            }
+            else if (strcmp(argv[1], "convolve_without_padding_matrixmult_with_openblas")==0)
+            {
+                int m_rows=static_cast<int>(stoi(argv[3]));
+                int k_rows=static_cast<int>(stoi(argv[5]));
+                if (m_rows<0 || k_rows<0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
+                if (m_rows>=k_rows)
+                {
+                    vector<vector<float> > input= read_matrix(argv[2], m_rows);
+                    vector<vector<float> > kernel=read_matrix(argv[4], k_rows);
+
+                    clock_t start = clock();
+                    vector<vector<float> > ans=toeplitz_convolve(input, kernel, 3);
+                    clock_t stop = clock();
+
+                    int ans_rows=static_cast<int>(ans.size());
+                    for(int i=0; i<ans_rows; i++)
+                    {
+                        for(int j=0;j<ans_rows;j++)
+                        {
+                            cout<<ans[i][j]<<" ";
+                        }
+                        cout<<endl;
+                    }
+                    cout<<endl<<"Running time for convolution = "<<(double)(stop-start)/(double)(CLOCKS_PER_SEC)<<endl;
+                    ofstream outfile;
+                    outfile.open("output.txt");
+                    for(int i=0; i<ans_rows; i++)
+                    {
+                        for(int j=0;j<ans_rows;j++)
+                        {
+                            outfile<<ans[j][i]<<endl;
+                        }
+                        //cout<<endl;
+                    }
+                    outfile.close();
+                }
+                else
+                {
+                    throw "The kernel matrix should be smaller than input matrix.";
+                }
+            }
+            else if (strcmp(argv[1], "convolve_without_padding_matrixmult_with_pthreads")==0)
+            {
+                int m_rows=static_cast<int>(stoi(argv[3]));
+                int k_rows=static_cast<int>(stoi(argv[5]));
+                if (m_rows<0 || k_rows<0)
+                {
+                    throw "The number of rows should be non-negative";
+                }
+                if (m_rows>=k_rows)
+                {
+                    vector<vector<float> > input= read_matrix(argv[2], m_rows);
+                    vector<vector<float> > kernel=read_matrix(argv[4], k_rows);
+
+                    clock_t start = clock();
+                    vector<vector<float> > ans=toeplitz_convolve(input, kernel, 4);
+                    clock_t stop = clock();
+
+                    int ans_rows=static_cast<int>(ans.size());
+                    for(int i=0; i<ans_rows; i++)
+                    {
+                        for(int j=0;j<ans_rows;j++)
+                        {
+                            cout<<ans[i][j]<<" ";
+                        }
+                        cout<<endl;
+                    }
+                    cout<<endl<<"Running time for convolution = "<<(double)(stop-start)/(double)(CLOCKS_PER_SEC)<<endl;
                     ofstream outfile;
                     outfile.open("output.txt");
                     for(int i=0; i<ans_rows; i++)
@@ -782,8 +1129,59 @@ int main(int argc, char *argv[])
     }
     catch (...)
     {
-        cout<<"Thera is something wrong with the arguments you have provided or the files you are using to input matrices/vectors"<<endl;
+        cout<<"There is something wrong with the arguments you have provided or the files you are using to input matrices/vectors"<<endl;
         cout<<"Please refer to README for further help"<<endl;
     }
+
+    /////////////////////////////////////////////////////
+    //Randomised portion of code
+    // srand(time(NULL));
+    // ofstream exec_file;
+    // exec_file.open("exec.txt");
+    // for(int i=2; i<500; i++)
+    // {
+    //     vector<vector<float> > input(i, vector<float>(i,0));
+    //     vector<vector<float> > kernel(i, vector<float>(i-2,0));
+    //
+    //     for(int x=0;x<i;x++)
+    //     {
+    //         for(int y=0;y<i;y++)
+    //         {
+    //             input[x][y]=rand();
+    //         }
+    //     }
+    //
+    //     for(int x=0;x<i;x++)
+    //     {
+    //         for(int y=0;y<(i-2);y++)
+    //         {
+    //             kernel[x][y]=rand();
+    //         }
+    //     }
+    //
+    //
+    //     clock_t start1 = clock();
+    //     vector<vector<float> > ans=matrix_multiply(input, kernel);
+    //     clock_t stop1 = clock();
+    //
+    //     clock_t start2 = clock();
+    //     ans=matrix_multiply_with_mkl(input, kernel);
+    //     clock_t stop2 = clock();
+    //
+    //     clock_t start3 = clock();
+    //     ans=matrix_multiply_with_openblas(input, kernel);
+    //     clock_t stop3 = clock();
+    //
+    //     clock_t start4 = clock();
+    //     ans=matrix_multiply_with_pthreads(input, kernel);
+    //     clock_t stop4 = clock();
+    //
+    //     exec_file<<(double)(stop1-start1)/(double)(CLOCKS_PER_SEC)<<" ";
+    //     exec_file<<(double)(stop2-start2)/(double)(CLOCKS_PER_SEC)<<" ";
+    //     exec_file<<(double)(stop3-start3)/(double)(CLOCKS_PER_SEC)<<" ";
+    //     exec_file<<(double)(stop4-start4)/(double)(CLOCKS_PER_SEC)<<" ";
+    //     exec_file<<endl;
+    //     cout<<i<<endl;
+    // }
     return 0;
 }

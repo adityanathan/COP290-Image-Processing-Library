@@ -1,0 +1,2 @@
+warnings:
+Do not provide empty matrices to convolve.
