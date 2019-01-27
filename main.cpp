@@ -925,7 +925,7 @@ int main(int argc, char *argv[])
                     }
                     else
                     {
-                        throw "If kernel contains odd rows, padding is not possible.";
+                        throw "If kernel contains even rows, padding is not possible.";
                     }
                 }
                 else
