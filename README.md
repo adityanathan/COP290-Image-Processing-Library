@@ -8,6 +8,14 @@
 
 In the terminal, enter the following to compile the code:
 
+  `$ export LD_LIBRARY_PATH=/path_to_your_openblas_installation_directory/lib/`
+
+  Example: `$ export LD_LIBRARY_PATH=/opt/OpenBLAS/lib/`
+
+  `$ export MKLROOT=/path_to_your_mkl_installation_directory/intel/mkl/`
+
+  Example: `$ export MKLROOT=~/intel/mkl/`
+
   `$ make`
 
 If you wish to delete the compiled code, enter the following:
@@ -37,7 +45,7 @@ If you wish to delete the compiled code, enter the following:
 
    * To obtain convolution of a square input matrix and a square kernel, both matrices of any size and the kernel smaller than the input:
 
-     * With and without input padding to maintain or reduce the size of the input matrix:
+     * With or without input padding to maintain or reduce the size of the input matrix:
 
       * Using dot products to convolve:
 
@@ -45,11 +53,23 @@ If you wish to delete the compiled code, enter the following:
 
          `$ ./output.out convolve_without_padding input_matrix.txt number_of_rows_of_input_matrix matrix2.txt number_of_rows_of_kernel`
 
-      * Using matrix mulltiplication to convolve:
+      * Using matrix mulltiplication with mkl to convolve:
 
-         `$ ./output.out convolve_with_padding_matrixmult input_matrix.txt number_of_rows_of_input_matrix matrix2.txt number_of_rows_of_kernel`
+         `$ ./output.out convolve_with_padding_matrixmult_with_mkl input_matrix.txt number_of_rows_of_input_matrix matrix2.txt number_of_rows_of_kernel`
 
-         `$ ./output.out convolve_without_padding_matrixmult input_matrix.txt number_of_rows_of_input_matrix matrix2.txt number_of_rows_of_kernel`
+         `$ ./output.out convolve_without_padding_matrixmult_with_mkl input_matrix.txt number_of_rows_of_input_matrix matrix2.txt number_of_rows_of_kernel`
+
+       * Using matrix mulltiplication with openBLAS to convolve:
+
+            `$ ./output.out convolve_with_padding_matrixmult_with_openblas input_matrix.txt number_of_rows_of_input_matrix matrix2.txt number_of_rows_of_kernel`
+
+            `$ ./output.out convolve_without_padding_matrixmult_with_openblas input_matrix.txt number_of_rows_of_input_matrix matrix2.txt number_of_rows_of_kernel`
+
+      * Using matrix mulltiplication with pthreads to convolve:
+
+           `$ ./output.out convolve_with_padding_matrixmult_with_pthreads input_matrix.txt number_of_rows_of_input_matrix matrix2.txt number_of_rows_of_kernel`
+
+           `$ ./output.out convolve_without_padding_matrixmult_with_pthreads input_matrix.txt number_of_rows_of_input_matrix matrix2.txt number_of_rows_of_kernel`
 
 ### Instructions for input
 
@@ -63,9 +83,6 @@ If you wish to delete the compiled code, enter the following:
 
    * If the arguments for number of rows is lesser than the actual dimensions of the matrix in the input file, then the program will only take the necessary amount of data and omit the rest.
 
- **Note**: The header file provided has not been linked to the cpp file and it is meant only as reference for the user for the various functions which have been used in the code.
+ **Note**: Sample input files have been provided. The output will also be displayed on the terminal and will be given in a text file output.txt in the same format as specified for input: vectors as single values in each line of the output file and matrices in column major order in each line of the output file
 
- **Note**: Sample input files have been provided. The output will be displayed on the terminal and will be given in a text file output.txt in the same format as specified for input: vectors as single values in each line of the output file and matrices in column major order in each line of the output file
-
- export LD_LIBRARY_PATH=/opt/OpenBLAS/lib/
- export MKLROOT=~/intel/mkl/
+ **WARNING**: pthreads implementation is mildly buggy. It occasionally fails to assign values to last 2-3 entries in the matrix.
