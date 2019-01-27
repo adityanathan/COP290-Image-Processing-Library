@@ -1134,54 +1134,54 @@ int main(int argc, char *argv[])
     }
 
     /////////////////////////////////////////////////////
-    //Randomised portion of code
-    // srand(time(NULL));
-    // ofstream exec_file;
-    // exec_file.open("exec.txt");
-    // for(int i=2; i<500; i++)
-    // {
-    //     vector<vector<float> > input(i, vector<float>(i,0));
-    //     vector<vector<float> > kernel(i, vector<float>(i-2,0));
-    //
-    //     for(int x=0;x<i;x++)
-    //     {
-    //         for(int y=0;y<i;y++)
-    //         {
-    //             input[x][y]=rand();
-    //         }
-    //     }
-    //
-    //     for(int x=0;x<i;x++)
-    //     {
-    //         for(int y=0;y<(i-2);y++)
-    //         {
-    //             kernel[x][y]=rand();
-    //         }
-    //     }
-    //
-    //
-    //     clock_t start1 = clock();
-    //     vector<vector<float> > ans=matrix_multiply(input, kernel);
-    //     clock_t stop1 = clock();
-    //
-    //     clock_t start2 = clock();
-    //     ans=matrix_multiply_with_mkl(input, kernel);
-    //     clock_t stop2 = clock();
-    //
-    //     clock_t start3 = clock();
-    //     ans=matrix_multiply_with_openblas(input, kernel);
-    //     clock_t stop3 = clock();
-    //
-    //     clock_t start4 = clock();
-    //     ans=matrix_multiply_with_pthreads(input, kernel);
-    //     clock_t stop4 = clock();
-    //
-    //     exec_file<<(double)(stop1-start1)/(double)(CLOCKS_PER_SEC)<<" ";
-    //     exec_file<<(double)(stop2-start2)/(double)(CLOCKS_PER_SEC)<<" ";
-    //     exec_file<<(double)(stop3-start3)/(double)(CLOCKS_PER_SEC)<<" ";
-    //     exec_file<<(double)(stop4-start4)/(double)(CLOCKS_PER_SEC)<<" ";
-    //     exec_file<<endl;
-    //     cout<<i<<endl;
-    // }
+    // Randomised portion of code
+    srand(time(NULL));
+    ofstream exec_file;
+    exec_file.open("exec.txt");
+    for(int i=2; i<500; i++)
+    {
+        vector<vector<float> > input(50, vector<float>(50,0));
+        vector<vector<float> > kernel(50, vector<float>(50,0));
+
+        for(int x=0;x<50;x++)
+        {
+            for(int y=0;y<50;y++)
+            {
+                input[x][y]=rand();
+            }
+        }
+
+        for(int x=0;x<50;x++)
+        {
+            for(int y=0;y<50;y++)
+            {
+                kernel[x][y]=rand();
+            }
+        }
+
+
+        clock_t start1 = clock();
+        vector<vector<float> > ans=matrix_multiply(input, kernel);
+        clock_t stop1 = clock();
+
+        clock_t start2 = clock();
+        ans=matrix_multiply_with_mkl(input, kernel);
+        clock_t stop2 = clock();
+
+        clock_t start3 = clock();
+        ans=matrix_multiply_with_openblas(input, kernel);
+        clock_t stop3 = clock();
+
+        clock_t start4 = clock();
+        ans=matrix_multiply_with_pthreads(input, kernel);
+        clock_t stop4 = clock();
+
+        exec_file<<(double)(stop1-start1)/(double)(CLOCKS_PER_SEC)<<" ";
+        exec_file<<(double)(stop2-start2)/(double)(CLOCKS_PER_SEC)<<" ";
+        exec_file<<(double)(stop3-start3)/(double)(CLOCKS_PER_SEC)<<" ";
+        exec_file<<(double)(stop4-start4)/(double)(CLOCKS_PER_SEC)<<" ";
+        exec_file<<endl;
+        cout<<i<<endl;
+    }
     return 0;
 }
