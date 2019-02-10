@@ -19,4 +19,7 @@ vector<vector<float> > maxpooling(vector<vector<float> > m, int width, int strid
 vector<vector<float> > average_pooling(vector<vector<float> > m, int width, int stride=1);
 vector<vector<float> > convolve(vector<vector<float> > matrix, vector<vector<float> > kernel);
 vector<vector<float>> toeplitz_convolve(vector<vector<float> > matrix, vector<vector<float> > kernel, int option);
+
+vector<float> lenet(vector<vector<float>> image, string conv1, string conv2, string fc1, string fc2);
+
 #endif /* function_convolution_h */

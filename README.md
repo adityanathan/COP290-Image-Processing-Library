@@ -86,3 +86,8 @@ If you wish to delete the compiled code, enter the following:
  **Note**: Sample input files have been provided. The output will also be displayed on the terminal and will be given in a text file output.txt in the same format as specified for input: vectors as single values in each line of the output file and matrices in column major order in each line of the output file
 
  **WARNING**: pthreads implementation is mildly buggy. It occasionally fails to assign values to last 2-3 entries in the matrix.
+
+
+ Report:
+
+ 
