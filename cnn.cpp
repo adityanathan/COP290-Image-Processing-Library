@@ -194,4 +194,9 @@ int main(int argc, char *argv[])
             outfile.close();
         }       
     }
+    catch (...)
+    {
+        cout<<"There is something wrong with the arguments you have provided or the files you are using to input matrices/vectors"<<endl;
+        cout<<"Please refer to README for further help"<<endl;
+    }
 }
