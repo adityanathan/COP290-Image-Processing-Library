@@ -136,7 +136,7 @@ vector<vector<vector<float> > > pool_layer (vector<vector<vector< float> > > inp
 
     for (int j=0; j<input.size();j++)
     {
-        ans[j] = average_pooling(input[j],2,2);
+        ans[j] = maxpooling(input[j],2,2);
     }
     return ans;
 }
