@@ -177,3 +177,14 @@ vector<float> lenet(string image, string conv1, string conv2, string fc1, string
     }
     return final_output;
 }
+int main(int argc, char *argv[])
+{
+    try
+    {
+        if (argc==2)
+        {
+            vector<float> out = lenet("data.txt","conv1.txt","conv2.txt","fc1.txt","fc2.txt");
+            vector<float> ans=softmax(out);
+        }       
+    }
+}
