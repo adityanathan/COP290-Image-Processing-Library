@@ -185,6 +185,13 @@ int main(int argc, char *argv[])
         {
             vector<float> out = lenet("data.txt","conv1.txt","conv2.txt","fc1.txt","fc2.txt");
             vector<float> ans=softmax(out);
+            ofstream outfile;
+            outfile.open("output.txt");
+            for(int i=0; i<ans.size(); i++)
+            {
+                outfile<<ans[i]<<endl;
+            }
+            outfile.close();
         }       
     }
 }
