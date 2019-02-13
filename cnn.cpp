@@ -29,21 +29,26 @@ mat_bias read_matrix(string s, int rows, int columns, int depth, int channels)
         vector<float> v;
         ifstream infile;
         infile.open(s);
+        // cout<<"21"<<endl;
         if(!infile)
         {
             throw "Error in file opening, kindly check the path of the file given";
         }
         string sd;
         float data;
+        //cout<<"22"<<endl;
         while(getline(infile, sd))
         {
-            data=stof(sd);
-
+            //cout<<sd<<endl;
+            data=1-stof(sd)/255.0;
+            //cout<<"31"<<endl;
             v.push_back(data);
         }
+        //cout<<"23"<<endl;
         vector<vector<vector<vector< float > > > > ans(channels,vector<vector<vector< float > > >(depth, (vector<vector< float > >(rows, vector<float>(columns,0)))));
         vector<float> bias_ans;
         int counter=0;
+        //cout<<"24"<<endl;
         if(channels*rows*columns*depth<=v.size())
         {
             for(int x=0; x<channels; x++)
@@ -56,16 +61,19 @@ mat_bias read_matrix(string s, int rows, int columns, int depth, int channels)
                         {
                             ans[x][k][i][j]=v[counter];
                             counter++;
+                            //cout<<ans[x][k][i][j]<<endl;
                         }
                     }
                 }
             }
             while(counter<v.size())
             {
-                bias_ans.push_back(v[counter])
+                bias_ans.push_back(v[counter]);
                 counter++;
             }
         }
+        //cout<<ans.size()<<" "<<ans[0].size()<<" "<<ans[0][0].size()<<" "<<ans[0][0][0].size()<<endl;
+        //cout<<bias_ans.size()<<endl;
         struct mat_bias return_out = {ans, bias_ans};
         return return_out;
     }
@@ -82,8 +90,8 @@ mat_bias read_matrix(string s, int rows, int columns, int depth, int channels)
 vector<vector<float>> matrix_elementwise_add(vector<vector<float>> a, vector<vector<float>> b)
 {
     //Assuming a.size()=b.size() and a[0].size()=b[0].size()
-    vector<vector<float> result(a.size(),vector<float>(a[0].size(),0));
-    if(a.size()=b.size() && a[0].size()=b[0].size())
+    vector<vector<float>> result(a.size(),vector<float>(a[0].size(),0));
+    if(a.size()==b.size() && a[0].size()==b[0].size())
     {
         for(int i=0; i<a.size(); i++)
         {
@@ -95,7 +103,7 @@ vector<vector<float>> matrix_elementwise_add(vector<vector<float>> a, vector<vec
     }
     else
     {
-        System.out.println("Matrix Dimensions aren't equal");
+        cout<<"Matrix Dimensions aren't equal";
     }
 
     return result;
@@ -106,7 +114,7 @@ vector<vector<vector<float>>> convolution_layer(vector<vector<vector<float>>> in
     //Assuming filters[0].size()=inputs.size()
     int output_dim = inputs[0].size()-filters[0][0].size()+1;
     int n = inputs.size();
-    vector<vector<vector<float>>> output(filters.size(),vector<vector<float>>(output_dim,vector<float>(output_dim,0)))
+    vector<vector<vector<float>>> output(filters.size(),vector<vector<float>>(output_dim,vector<float>(output_dim,0)));
     for(int j=0; j<filters.size(); j++)
     {
         vector<vector<vector<float>>> intermediate_output(n,vector<vector<float>>(output_dim,vector<float>(output_dim,0)));
@@ -114,13 +122,12 @@ vector<vector<vector<float>>> convolution_layer(vector<vector<vector<float>>> in
         {
             intermediate_output[i]=toeplitz_convolve(inputs[i], filters[j][i], 3);
         }
-        vector<vector<float> summed_matrix(output_dim.size(),vector<float>(output_dim.size(),0));
+        vector<vector<float>> summed_matrix(output_dim,vector<float>(output_dim,0));
         for(int k=0;k<n;k++)
         {
             summed_matrix=matrix_elementwise_add(summed_matrix,intermediate_output[k]);
         }
-
-        vector<vector<float> bias_matrix(output_dim.size(),vector<float>(output_dim.size(),bias[j]));
+        vector<vector<float>> bias_matrix(output_dim,vector<float>(output_dim,bias[j]));
         summed_matrix=matrix_elementwise_add(summed_matrix,bias_matrix);
         output[j]=summed_matrix;
     }
@@ -155,48 +162,68 @@ vector<vector<vector< float> > > relu_layer(vector<vector<vector<float> > > inpu
 
 vector<float> lenet(string image, string conv1, string conv2, string fc1, string fc2)
 {
-    mat_bias input_image = read_matrix(image,28,28,1,1)
+    mat_bias input_image = read_matrix(image,28,28,1,1);
     mat_bias convolve_layer1=read_matrix(conv1,5,5,1,20);
     mat_bias convolve_layer2=read_matrix(conv2,5,5,20,50);
     mat_bias fc_layer1=read_matrix(fc1,4,4,50,500);
     mat_bias fc_layer2=read_matrix(fc2,1,1,500,10);
-
+    // cout<<"12"<<endl;
     // vector<vector<vector<float>>> temp_image(1,image)
-    vector<vector<vector<float>>> cv1_output = convolution_layer((input_image->matrix)[0], convolve_layer1->matrix, convolve_layer1->bias);
-    vector<vector<vector<float>>> pool1_output = pool_layer(cv1_output);
-    vector<vector<vector<float>>> cv2_output = convolution_layer(pool1_output, convolve_layer2->matrix, convolve_layer2->bias);
-    vector<vector<vector<float>>> pool2_output = pool_layer(cv2_output);
-    vector<vector<vector<float>>> fc1_output = convolution_layer(pool2_output, fc_layer1->matrix, fc_layer1->bias);
-    vector<vector<vector<float>>> relu1_output = relu_layer(fc1_output);
-    vector<vector<vector<float>>> fc2_output = convolution_layer(relu1_output, fc_layer2->matrix, fc_layer2->bias);
-
-    vector<float> final_output(fc2_output[0].size(), 0);
-    for(int i=0; i<fc2_output[0].size();i++)
-    {
-        final_output[i]=fc2_output[0][i][0];
+    vector<vector<vector<float>>> cv1_output = convolution_layer((input_image.matrix)[0], convolve_layer1.matrix, convolve_layer1.bias);
+    ofstream outfile;
+    outfile.open("debug.txt");
+    for (int i = 0; i < cv1_output.size(); i++) {
+        for (int j = 0; j < cv1_output[0].size(); j++) {
+            for (size_t k = 0; k < cv1_output[0][0].size(); k++) {
+                outfile<<cv1_output[i][j][k]<<endl;
+            }
+        }
     }
+    outfile.close();
+
+    //cout<<cv1_output.size()<<" "<<cv1_output[0].size()<<" "<<cv1_output[0][0].size()<<endl;
+    vector<vector<vector<float>>> pool1_output = pool_layer(cv1_output);
+    //cout<<pool1_output.size()<<" "<<pool1_output[0].size()<<" "<<pool1_output[0][0].size()<<endl;
+    vector<vector<vector<float>>> cv2_output = convolution_layer(pool1_output, convolve_layer2.matrix, convolve_layer2.bias);
+    //cout<<cv2_output.size()<<" "<<cv2_output[0].size()<<" "<<cv2_output[0][0].size()<<endl;
+    vector<vector<vector<float>>> pool2_output = pool_layer(cv2_output);
+    //cout<<pool2_output.size()<<" "<<pool2_output[0].size()<<" "<<pool2_output[0][0].size()<<endl;
+    vector<vector<vector<float>>> fc1_output = convolution_layer(pool2_output, fc_layer1.matrix, fc_layer1.bias);
+    //cout<<fc1_output.size()<<" "<<fc1_output[0].size()<<" "<<fc1_output[0][0].size()<<endl;
+    vector<vector<vector<float>>> relu1_output = relu_layer(fc1_output);
+    //cout<<relu1_output.size()<<" "<<relu1_output[0].size()<<" "<<relu1_output[0][0].size()<<endl;
+    vector<vector<vector<float>>> fc2_output = convolution_layer(relu1_output, fc_layer2.matrix, fc_layer2.bias);
+    //cout<<fc2_output.size()<<" "<<fc2_output[0].size()<<" "<<fc2_output[0][0].size()<<endl;
+    vector<float> final_output(fc2_output.size(), 0);
+    for(int i=0; i<fc2_output.size();i++)
+    {
+        final_output[i]=fc2_output[i][0][0];
+        cout<<final_output[i]<<endl;
+    }
+    // cout<<"20"<<endl;
+    cout<<stof("-20")<<endl;
     return final_output;
 }
-int main(int argc, char *argv[])
-{
-    try
-    {
-        if (argc==2)
-        {
-            vector<float> out = lenet("data.txt","conv1.txt","conv2.txt","fc1.txt","fc2.txt");
-            vector<float> ans=softmax(out);
-            ofstream outfile;
-            outfile.open("output.txt");
-            for(int i=0; i<ans.size(); i++)
-            {
-                outfile<<ans[i]<<endl;
-            }
-            outfile.close();
-        }       
-    }
-    catch (...)
-    {
-        cout<<"There is something wrong with the arguments you have provided or the files you are using to input matrices/vectors"<<endl;
-        cout<<"Please refer to README for further help"<<endl;
-    }
-}
+// int main(int argc, char *argv[])
+// {
+//     try
+//     {
+//         if (argc==2)
+//         {
+//             vector<float> out = lenet(argv[1],"conv1.txt","conv2.txt","fc1.txt","fc2.txt");
+//             vector<float> ans=softmax(out);
+//             ofstream outfile;
+//             outfile.open("output.txt");
+//             for(int i=0; i<ans.size(); i++)
+//             {
+//                 outfile<<ans[i]<<endl;
+//             }
+//             outfile.close();
+//         }
+//     }
+//     catch (...)
+//     {
+//         cout<<"There is something wrong with the arguments you have provided or the files you are using to input matrices/vectors"<<endl;
+//         cout<<"Please refer to README for further help"<<endl;
+//     }
+// }

@@ -14,7 +14,7 @@ In the terminal, enter the following to compile the code:
 
   `$ export MKLROOT=/path_to_your_mkl_installation_directory/intel/mkl/`
 
-  Example: `$ export MKLROOT=~/intel/mkl/`
+  Example: `$ export MKLROOT=~/Frameworks/intel-mkl/mkl/`
 
   `$ make`
 
@@ -89,5 +89,3 @@ If you wish to delete the compiled code, enter the following:
 
 
  Report:
-
- 
