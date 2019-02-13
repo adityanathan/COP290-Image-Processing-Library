@@ -224,7 +224,8 @@ vector<vector<float> > reflect_kernel(vector<vector<float> > kernel)
 vector<vector<float> > convolve(vector<vector<float> > matrix, vector<vector<float> > kernel)
 {
     vector<vector<float> > reflected_kernel = kernel;
-    // vector<vector<float> > reflected_kernel = reflect_kernel(kernel);
+    //WARNING: This was done in order to make our answers match for LeNet CNN.
+    //vector<vector<float> > reflected_kernel = reflect_kernel(kernel);
     int m =static_cast<int>( matrix.size());
     int k = static_cast<int>(kernel.size());
     vector < vector <float> > convoluted_matrix(m-k+1, std::vector<float>(m-k+1, 0));

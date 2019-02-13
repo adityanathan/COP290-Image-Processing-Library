@@ -40,7 +40,7 @@ mat_bias read_matrix(string s, int rows, int columns, int depth, int channels)
         while(getline(infile, sd))
         {
             //cout<<sd<<endl;
-            if(s=="1_new.txt")
+            if(s=="1_new.txt" || s=="2_new.txt")
                 data=1-stof(sd)/255.0;
             else
                 data=stof(sd);
