@@ -13,7 +13,7 @@ using namespace std;
 //
 //     for (int i=0; i<n; i++)
 //     {
-//         output[i]=toeplitz_convolve(input, filters[i], 3); //3 - matrix_mult done with openBLAS
+//         output[i]=convolve(input, filters[i], 3); //3 - matrix_mult done with openBLAS
 //     }
 // }
 
@@ -40,7 +40,10 @@ mat_bias read_matrix(string s, int rows, int columns, int depth, int channels)
         while(getline(infile, sd))
         {
             //cout<<sd<<endl;
-            data=1-stof(sd)/255.0;
+            if(s=="1_new.txt")
+                data=1-stof(sd)/255.0;
+            else
+                data=stof(sd);
             //cout<<"31"<<endl;
             v.push_back(data);
         }
@@ -120,7 +123,7 @@ vector<vector<vector<float>>> convolution_layer(vector<vector<vector<float>>> in
         vector<vector<vector<float>>> intermediate_output(n,vector<vector<float>>(output_dim,vector<float>(output_dim,0)));
         for(int i=0; i<n; i++)
         {
-            intermediate_output[i]=toeplitz_convolve(inputs[i], filters[j][i], 3);
+            intermediate_output[i]=convolve(inputs[i], filters[j][i]);
         }
         vector<vector<float>> summed_matrix(output_dim,vector<float>(output_dim,0));
         for(int k=0;k<n;k++)
@@ -167,20 +170,8 @@ vector<float> lenet(string image, string conv1, string conv2, string fc1, string
     mat_bias convolve_layer2=read_matrix(conv2,5,5,20,50);
     mat_bias fc_layer1=read_matrix(fc1,4,4,50,500);
     mat_bias fc_layer2=read_matrix(fc2,1,1,500,10);
-    // cout<<"12"<<endl;
-    // vector<vector<vector<float>>> temp_image(1,image)
-    vector<vector<vector<float>>> cv1_output = convolution_layer((input_image.matrix)[0], convolve_layer1.matrix, convolve_layer1.bias);
-    ofstream outfile;
-    outfile.open("debug.txt");
-    for (int i = 0; i < cv1_output.size(); i++) {
-        for (int j = 0; j < cv1_output[0].size(); j++) {
-            for (size_t k = 0; k < cv1_output[0][0].size(); k++) {
-                outfile<<cv1_output[i][j][k]<<endl;
-            }
-        }
-    }
-    outfile.close();
 
+    vector<vector<vector<float>>> cv1_output = convolution_layer((input_image.matrix)[0], convolve_layer1.matrix, convolve_layer1.bias);
     //cout<<cv1_output.size()<<" "<<cv1_output[0].size()<<" "<<cv1_output[0][0].size()<<endl;
     vector<vector<vector<float>>> pool1_output = pool_layer(cv1_output);
     //cout<<pool1_output.size()<<" "<<pool1_output[0].size()<<" "<<pool1_output[0][0].size()<<endl;
@@ -198,10 +189,10 @@ vector<float> lenet(string image, string conv1, string conv2, string fc1, string
     for(int i=0; i<fc2_output.size();i++)
     {
         final_output[i]=fc2_output[i][0][0];
-        cout<<final_output[i]<<endl;
+        // cout<<final_output[i]<<endl;
     }
     // cout<<"20"<<endl;
-    cout<<stof("-20")<<endl;
+    // cout<<stof("-20")<<endl;
     return final_output;
 }
 // int main(int argc, char *argv[])
