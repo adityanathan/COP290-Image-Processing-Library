@@ -5,6 +5,8 @@
 #include <cmath>
 #include <string.h>
 //#include "functions.h"
+#include<tuple>
+#include <bits/stdc++.h>
 #include "function_convolution.h"
 #include <chrono>
 #include <cstdlib>
