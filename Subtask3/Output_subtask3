@@ -1,0 +1,24 @@
+Last login: Sun Feb 17 19:44:52 on ttys001
+-bash: /usr/poorvagarg/java_home: No such file or directory
+Poorvas-MacBook-Pro:~ poorvagarg$ cd Downloads/example
+Poorvas-MacBook-Pro:example poorvagarg$ python preprocess.py Digit_2.png
+Poorvas-MacBook-Pro:example poorvagarg$ ./output.out
+Digit	Probability
+2	0.999427
+3	0.000569668
+7	1.73426e-06
+1	8.444e-07
+8	6.46108e-07
+Poorvas-MacBook-Pro:example poorvagarg$ 
+
+
+
+
+
+
+
+
+
+
+
+
